@@ -1,0 +1,62 @@
+<!-- viewExpenses.html -->
+<!-- Version 0.1.11.3c – now syncs with viewExpenses.js for version + fixes default date + refresh behavior -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recent Expenses</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 1rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+    }
+    .controls {
+      margin: 1rem 0;
+    }
+    label {
+      margin-right: 1rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    .even {
+      background-color: #f9f9f9;
+    }
+    .odd {
+      background-color: #fff;
+    }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #555;
+    }
+  </style>
+  <script src="js/viewExpenses.js" defer></script>
+</head>
+<body>
+  <h1>Recent Expenses</h1>
+  <p>Select a date range below to filter your transactions.</p>
+  <div class="controls">
+    <label>From <input type="date" id="startDate" /></label>
+    <label>To <input type="date" id="endDate" /></label>
+    <button id="refreshBtn">Refresh</button>
+  </div>
+  <div id="tableContainer"></div>
+  <div id="totals"></div>
+  <footer>
+    Budgie © 2025 — A project by David & ChatGPT<br />
+    Version 0.1.11.3c – View Expenses Page<br />
+    Linked JS version: <span id="jsVersion">(pending)</span>
+  </footer>
+</body>
+</html>
