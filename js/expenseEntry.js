@@ -1,0 +1,52 @@
+<!-- expenseEntry.html
+    David Purdy, ChatGPT o3
+    2025-05-04
+    This file is part of Budgie, a personal finance app 
+    and will replace the Google Forms Regular Expenses form
+    with a custom HTML form that feeds one row at a time to 
+    Form Responses 6! and ExpenseItems! in EDSandy.
+    --->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>New Expense</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="p‑4">
+  <h1>Quick Expense Entry</h1>
+
+  <form id="expense-form">
+    <label>Date:
+      <input type="date" id="date" required>
+    </label><br>
+
+    <label>Amount:
+      <input type="number" id="amount" step="0.01" required>
+    </label><br>
+
+    <label>Category:
+      <select id="category" required>
+        <option value="" disabled selected>Select a category…</option>
+      </select>
+    </label><br>
+
+    <label>Sub‑category:
+      <select id="subcategory" required></select>
+    </label><br>
+
+    <label>Description:
+      <input type="text" id="description">
+    </label><br>
+
+    <label>Payment Method:
+      <input type="text" id="payMethod">
+    </label><br><br>
+
+    <button type="submit">Save Expense</button>
+  </form>
+
+  <script src="js/expenseEntry.js"></script>
+</body>
+</html>
