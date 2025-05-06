@@ -1,0 +1,66 @@
+{
+  "Housing & Utilities": [
+    "Rent / Mortgage",
+    "Electricity / Gas",
+    "Water / Sewer",
+    "Internet & Mobile",
+    "Repairs & Maintenance"
+  ],
+  "Household & Food": [
+    "Supermarket Groceries",
+    "Bulk‑club / Warehouse",
+    "Market Stall / Wet‑market",
+    "Household Non‑food (detergent, paper)"
+  ],
+  "Transportation": [
+    "Fuel / Gasoline",
+    "Public Transport / Jeepney",
+    "Taxi / Ride share",
+    "Repairs & Maintenance",
+    "Registration & Insurance"
+  ],
+  "Health & Personal": [
+    "Doctor / Clinic visits",
+    "Prescription Meds",
+    "Personal Care (haircuts etc.)"
+  ],
+  "Education": [
+    "Tuition",
+    "School Supplies",
+    "Lessons / Activities"
+  ],
+  "Clothing": [
+    "Everyday Clothing",
+    "Work / Uniform",
+    "Kids’ Clothing"
+  ],
+  "Leisure & Subscriptions": [
+    "Streaming / Subscriptions",
+    "Hobbies & Crafts",
+    "Dining Out & Coffee"
+  ],
+  "Travel": [
+    "Airfare / Transport",
+    "Lodging",
+    "Vacation Food"
+  ],
+  "Pets": [
+    "Fish food",
+    "Filters, aerator stones, accessories",
+    "Fish pond repairs/expenses",
+    "New fish purchases"
+  ],
+  "Giving & Gifts": [
+    "Religious",
+    "Gifts & Celebrations",
+    "Donations to family"
+  ],
+  "Financial & Legal": [
+    "Banking / Transfer fees",
+    "Legal / Professional fees"
+  ],
+  "Savings & Debt": [
+    "Savings / Investments",
+    "Debt Repayments"
+  ]
+}
