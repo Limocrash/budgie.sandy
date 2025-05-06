@@ -5,6 +5,7 @@ const BASE      = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APP
 const CAT_URL   = `${BASE}?action=getCategories`;
 const SAVE_URL  = `${BASE}?action=addExpense`;
 
+
 // ---------- load category map ----------
 async function loadCategoryMap() {
   try {
