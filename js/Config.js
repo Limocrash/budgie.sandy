@@ -12,3 +12,4 @@ window.BUDGIE_CONFIG = {
   "VIEW_EXPENSES_CSV": "https://docs.google.com/spreadsheets/d/1AStIoowJuZX2enGOCrvLwnG4F4Ypg9VK5NZp-oDE8yo/gviz/tq?tqx=out:csv&sheet=Form%20Responses%206",
   "VIEW_EXPENSES_PAGE": "https://limocrash.github.io/budgie/viewExpenses.html"
 };
+console.log('Config loaded:', window.BUDGIE_CONFIG);

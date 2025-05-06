@@ -1,12 +1,16 @@
 /** expenseEntry.js **/
 
 // ---------- constants built from Config.js ----------
-const BASE      = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
+if (!window.BUDGIE_CONFIG || !window.BUDGIE_CONFIG.APPS_SCRIPT_ID) {
+  throw new Error('BUDGIE_CONFIG or APPS_SCRIPT_ID is not defined. Ensure config.js is loaded first.');
+}
+const BASE = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
 const CAT_URL   = `${BASE}?action=getCategories`;
 const SAVE_URL  = `${BASE}?action=addExpense`;
-
+console.log('Config in expenseEntry.js:', window.BUDGIE_CONFIG);
 
 // ---------- load category map ----------
+
 async function loadCategoryMap() {
   try {
     const res = await fetch(CAT_URL, {cache:'no-store'});
