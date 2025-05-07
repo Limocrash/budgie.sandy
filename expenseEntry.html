@@ -29,26 +29,43 @@
           <input type="number" id="amount" step="0.01" required>
         </label><br>
     
-        <label>Category:
-          <select id="category" required>
-            <option value="" disabled selected>Select a category…</option>
-          </select>
-        </label><br>
-    
-        <label>Sub‑category:
-          <select id="subcategory" required></select>
-        </label><br>
+        <label>Category:</label>
+          <select id="category"></select><br>
+
+        <label>Sub‑category:</label>
+          <select id="subcategory"></select><br>
     
         <label>Description:
           <input type="text" id="description">
         </label><br>
-    
-        <label>Payment Method:
-          <input type="text" id="payMethod">
-        </label><br><br>
-    
+        
+        <!--  Beneficiary check‑boxes  -->
+        <label>Beneficiary:</label>
+        <div id="beneficiaries">
+          <label><input type="checkbox" value="P001"> Mom</label>
+          <label><input type="checkbox" value="P002"> Dad</label>
+          <label><input type="checkbox" value="P003"> Darbie</label>
+          <label><input type="checkbox" value="P004"> Ari</label>
+          <label><input type="checkbox" value="OTHER"> Other / Family</label>
+        </div>
+        <br>
+
+        <!--  Payment‑Method dropdown (static for now)  -->
+        <label>Payment Method:</label>
+        <select id="payMethod">
+          <option value="">— pick —</option>
+          <option>Cash – Mom</option>
+          <option>Cash – Dad</option>
+          <option>G‑Cash Mom</option>
+          <option>BPI Debit Mom</option>
+          <option>BPI Debit Dad</option>
+        </select>
+        <br>
+
+
         <button type="submit">Save Expense</button>
       </form>
+
       <script src="js/expenseEntry.js"></script>
       
     </body>
