@@ -1,6 +1,6 @@
 /** expenseEntry.js **/
 
-// ---------- constants built from Config.js ----------
+// ---------- constants built from config.js ----------
 if (!window.BUDGIE_CONFIG || !window.BUDGIE_CONFIG.APPS_SCRIPT_ID) {
   throw new Error('BUDGIE_CONFIG or APPS_SCRIPT_ID is not defined. Ensure config.js is loaded first.');
 }
@@ -18,7 +18,7 @@ async function loadCategoryMap() {
     return await res.json();
   } catch(err) {
     console.warn('Using fallback categories.json', err);
-    const fallback = await fetch('/data/categories.json');
+    const fallback = await fetch('data/categories.json');
     return fallback.json();
   }
 }
