@@ -1,91 +1,89 @@
-/** expenseEntry.js **/
+/* -----------------------------------------------------------
+ *  expenseEntry.js   –  Quick Expense Entry (v0.1.15)
+ * -----------------------------------------------------------
+ *  • Reads window.BUDGIE_CONFIG (injected by Config.js)
+ *  • GET  /exec?action=getCategories   → build Cat / Sub‑cat dropdowns
+ *  • POST /exec?action=addExpense      → save one expense row
+ * --------------------------------------------------------- */
 
-// ---------- constants built from config.js ----------
-if (!window.BUDGIE_CONFIG || !window.BUDGIE_CONFIG.APPS_SCRIPT_ID) {
-  throw new Error('BUDGIE_CONFIG or APPS_SCRIPT_ID is not defined. Ensure config.js is loaded first.');
+/* ---------- 1.  Config & URLs ---------- */
+if (!window.BUDGIE_CONFIG?.APPS_SCRIPT_ID) {
+  throw new Error('Config.js missing or APPS_SCRIPT_ID not defined.');
 }
-const BASE = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
+
+const BASE      = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
 const CAT_URL   = `${BASE}?action=getCategories`;
 const SAVE_URL  = `${BASE}?action=addExpense`;
-console.log('Config in expenseEntry.js:', window.BUDGIE_CONFIG);
 
-// ---------- load category map ----------
+console.log('Expense‑entry JS booted:', { CAT_URL, SAVE_URL });
 
-async function saveExpense(expenseData) {
+/* ---------- 2.  Helper: load category → sub list ---------- */
+async function loadCategoryMap () {
   try {
-    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action: 'addExpense',
-        ...expenseData,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('Expense saved:', result);
-    return result;
+    const res = await fetch(CAT_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('live fetch failed');
+    return await res.json();                    // { "Housing":[ "Rent", … ] }
   } catch (err) {
-    console.error('Error saving expense:', err);
-    throw err;
+    console.warn('Using local fallback categories.json', err);
+    const local = await fetch('data/categories.json');
+    return local.json();
   }
 }
 
-// immediately‑invoked async to build dropdowns
-(async ()=>{
+/* ---------- 3.  Helper: collect checked beneficiaries ---------- */
+function getCheckedBeneficiaries () {
+  return Array.from(document.querySelectorAll('#beneficiaries input:checked'))
+              .map(cb => cb.value);             // [ "P001", "P003" ]
+}
+
+/* ---------- 4.  Build dropdowns on page load ---------- */
+(async () => {
   const map    = await loadCategoryMap();
   const catSel = document.getElementById('category');
   const subSel = document.getElementById('subcategory');
 
-  // populate Category dropdown
-  Object.keys(map).forEach(cat=>{
-    catSel.add(new Option(cat, cat));
-  });
+  Object.keys(map).forEach(cat => catSel.add(new Option(cat, cat)));
 
-  // when Category changes, rebuild Sub list
-  catSel.addEventListener('change', ()=>{
+  catSel.addEventListener('change', () => {
     subSel.innerHTML = '';
-    map[catSel.value].forEach(sub=>{
-      subSel.add(new Option(sub, sub));
-    });
+    (map[catSel.value] || []).forEach(sub =>
+      subSel.add(new Option(sub, sub))
+    );
   });
 })();
 
-// ---------- submit handler ----------
-document.getElementById('expense-form').addEventListener('submit', async (e)=>{
+/* ---------- 5.  Submit handler ---------- */
+document.getElementById('expense-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const payload = {
-    date:        document.getElementById('date').value,
-    amount:      Number(document.getElementById('amount').value),
-    category:    document.getElementById('category').value,
-    subcategory: document.getElementById('subcategory').value,
-    description: document.getElementById('description').value || '',
-    payMethod:   document.getElementById('payMethod').value || '',
+    action       : 'addExpense',                     // router key
+    date         : document.getElementById('date').value,
+    amount       : Number(document.getElementById('amount').value),
+    category     : document.getElementById('category').value,
+    subcategory  : document.getElementById('subcategory').value,
+    description  : document.getElementById('description').value || '',
+    payMethod    : document.getElementById('payMethod').value    || '',
+    beneficiaries: getCheckedBeneficiaries()                     // ["P001"]
   };
 
   try {
     const res = await fetch(SAVE_URL, {
-      method : "POST",
-      headers: {"Content-Type":"application/json"},
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body   : JSON.stringify(payload)
     });
+
     const out = await res.json();
     if (out.ok) {
-      alert(`Saved! ExpenseID ${out.expenseID}`);
+      alert(`Saved!  ExpenseID ${out.expenseID}`);
       e.target.reset();
       document.getElementById('subcategory').innerHTML = '';
     } else {
-      throw new Error(out.msg || 'Unknown error');
+      throw new Error(out.msg || 'Server error');
     }
-  } catch(err){
+  } catch (err) {
     alert('Save failed: ' + err.message);
     console.error(err);
   }
 });
-// ---------- end of file ----------
