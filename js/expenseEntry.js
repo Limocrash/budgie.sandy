@@ -11,15 +11,29 @@ console.log('Config in expenseEntry.js:', window.BUDGIE_CONFIG);
 
 // ---------- load category map ----------
 
-async function loadCategoryMap() {
+async function saveExpense(expenseData) {
   try {
-    const res = await fetch(CAT_URL, {cache:'no-store'});
-    if (!res.ok) throw new Error('live fetch failed');
-    return await res.json();
-  } catch(err) {
-    console.warn('Using fallback categories.json', err);
-    const fallback = await fetch('data/categories.json');
-    return fallback.json();
+    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'addExpense',
+        ...expenseData,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Expense saved:', result);
+    return result;
+  } catch (err) {
+    console.error('Error saving expense:', err);
+    throw err;
   }
 }
 
