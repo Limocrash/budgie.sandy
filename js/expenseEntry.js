@@ -5,93 +5,73 @@
  *  • GET  /exec?action=getCategories   → build Cat / Sub‑cat dropdowns
  *  • POST /exec?action=addExpense      → save one expense row
  * 
- * version 0.1.15 stardate: 20250510.2111
- * ----------------------------------------------------------------------
- *  – JSON‑P for read‑only GET (avoids CORS)
- *  – JSON POST for write (addExpense)
+ * version 0.1.15 stardate: 20250511.1006
  * ====================================================================*/
+/* ------------ 0. Config ------------- */
+const SAVE_URL   = 'https://script.google.com/macros/s/AKfycbzXYPCQnM3WpoHx.../exec';
+const CATS_URL   = SAVE_URL + '?action=getCategories';    // JSON‑P
 
-/* ---------- 0.  Config ------------------------------------------------ */
-if (!window.BUDGIE_CONFIG?.APPS_SCRIPT_ID) {
-  alert('Config.js missing APPS_SCRIPT_ID'); throw new Error('No config');
-}
-const BASE     = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
-const CAT_URL  = `${BASE}?action=getCategories&callback=handleCats&_=${Date.now()}`;
-const SAVE_URL = `${BASE}?action=addExpense`;
-
-console.log('Booting expenseEntry', { CAT_URL, SAVE_URL });
-
-/* ---------- 1.  JSON‑P loader ---------------------------------------- */
-function handleCats(map) {
-  /* map = { "Category name": ["Sub A","Sub B"], … } */
-  buildCategoryUI(map);
-}
-
-/* inject a script tag – JSON‑P response will call handleCats() */
-(function fetchCategories () {
+/* ------------ 1.  Load category map via JSON‑P ------------- */
+(function injectJsonP () {
   const s = document.createElement('script');
-  s.src = CAT_URL;
-  s.onerror = () => {
-    alert('Failed to load categories – check Apps Script deployment.');
-  };
+  s.src = CATS_URL;
   document.head.appendChild(s);
 })();
 
-/* ---------- 2.  Build UI once JSON‑P arrives ------------------------- */
+window.loadCategoryMap = function (map) {     // called by JSON‑P
+  console.log('Category map', map);
+  buildCategoryUI(map);
+};
+
+/* ------------ 2.  Build the dropdowns ------------- */
 function buildCategoryUI (map) {
   const catSel = document.getElementById('category');
   const subSel = document.getElementById('subcategory');
 
-  /* populate category dropdown */
+  // populate main list
   Object.keys(map).forEach(cat => catSel.add(new Option(cat, cat)));
 
-  /* on category change → fill sub‑list */
+  // on change, refill sub list
   catSel.addEventListener('change', () => {
     subSel.innerHTML = '';
-    (map[catSel.value] || []).forEach(sub =>
-      subSel.add(new Option(sub, sub))
-    );
+    (Array.isArray(map[catSel.value]) ? map[catSel.value] : [])
+      .forEach(sub => subSel.add(new Option(sub, sub)));
   });
 }
 
-/* ---------- 3.  Helper: checked beneficiaries ------------------------ */
+/* ------------ 3.  Who’s checked? ------------- */
 function getCheckedBeneficiaries () {
-  return Array.from(document.querySelectorAll('#beneficiaries input:checked'))
-              .map(cb => cb.value);  // ["P001", "P003"]
+  return Array.from(
+    document.querySelectorAll('#beneficiaries input:checked')
+  ).map(cb => cb.value);           // ["P001", "P003"]
 }
 
-/* ---------- 4.  Submit handler -------------------------------------- */
-document.getElementById('expense-form').addEventListener('submit', async (e) => {
+/* ------------ 4.  Submit ------------- */
+document.getElementById('expense-form')
+        .addEventListener('submit', async e => {
   e.preventDefault();
 
   const payload = {
     action       : 'addExpense',
     date         : document.getElementById('date').value,
-    amount       : Number(document.getElementById('amount').value),
+    amount       : document.getElementById('amount').value,
     category     : document.getElementById('category').value,
     subcategory  : document.getElementById('subcategory').value,
-    description  : document.getElementById('description').value || '',
-    payMethod    : document.getElementById('payMethod').value    || '',
+    description  : document.getElementById('description').value,
+    payMethod    : document.getElementById('paymethod').value,
     beneficiaries: getCheckedBeneficiaries()
   };
 
   try {
-    const res  = await fetch(SAVE_URL, {
+    await fetch(SAVE_URL, {
       method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      mode   : 'no-cors',                    // ← 💡 key trick
+      headers: { 'Content-Type': 'text/plain' },
       body   : JSON.stringify(payload)
     });
-    const out = await res.json();
-
-    if (out.ok) {
-      alert(`Saved!  ExpenseID ${out.id}`);
-      e.target.reset();
-      document.getElementById('subcategory').innerHTML = '';
-    } else {
-      throw new Error(out.msg || 'Server error');
-    }
+    alert('Saved 👍');                       // we can’t inspect response
+    e.target.reset();
   } catch (err) {
-    alert('Save failed: ' + err.message);
-    console.error(err);
+    alert('Save failed – offline?');
   }
 });
