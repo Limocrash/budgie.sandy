@@ -34,13 +34,14 @@ document.getElementById('expense-form').addEventListener('submit', async e => {
   e.preventDefault();
   const p = {
     action      : 'addExpense',
-    date        : e.target.date.value,
-    amount      : e.target.amount.value,
-    category    : e.target.category.value,
-    subcategory : e.target.subcategory.value,
-    description : e.target.description.value,
-    payMethod   : e.target.paymethod.value
+    date        : document.getElementById('date').value,
+    amount      : Number(document.getElementById('amount').value),
+    category    : document.getElementById('category').value,
+    subcategory : document.getElementById('subcategory').value,
+    description : document.getElementById('description').value,
+    payMethod   : document.getElementById('payMethod').value      // <- fixed
   };
+  
   await fetch(BASE, {
     method : 'POST',
     mode   : 'no-cors',
