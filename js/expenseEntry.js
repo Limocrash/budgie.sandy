@@ -58,7 +58,7 @@ document.getElementById('expense-form')
     category     : document.getElementById('category').value,
     subcategory  : document.getElementById('subcategory').value,
     description  : document.getElementById('description').value,
-    payMethod    : document.getElementById('paymethod').value,
+    paymentMethod: document.getElementById('paymentmethod').value,
     beneficiaries: getCheckedBeneficiaries()
   };
 
