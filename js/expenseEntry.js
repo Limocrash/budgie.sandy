@@ -5,73 +5,48 @@
  *  • GET  /exec?action=getCategories   → build Cat / Sub‑cat dropdowns
  *  • POST /exec?action=addExpense      → save one expense row
  * 
- * version 0.1.15 stardate: 20250511.1006
+ * version 0.1.15 stardate: 20250511.2127
  * ====================================================================*/
-/* ------------ 0. Config ------------- */
-const SAVE_URL   = 'https://script.google.com/macros/s/AKfycbzXYPCQnM3WpoHx.../exec';
-const CATS_URL   = SAVE_URL + '?action=getCategories';    // JSON‑P
+// --- MINIMAL JSON‑P + NO‑CORS VERSION ---
 
-/* ------------ 1.  Load category map via JSON‑P ------------- */
-(function injectJsonP () {
-  const s = document.createElement('script');
-  s.src = CATS_URL;
+const BASE = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
+
+/* 1. load categories via JSON‑P */
+(function () {
+  const cb  = 'loadCategoryMap';
+  const s   = document.createElement('script');
+  s.src = `${BASE}?action=getCategories&callback=${cb}&_=${Date.now()}`;
   document.head.appendChild(s);
 })();
 
-window.loadCategoryMap = function (map) {     // called by JSON‑P
-  console.log('Category map', map);
-  buildCategoryUI(map);
-};
-
-/* ------------ 2.  Build the dropdowns ------------- */
-function buildCategoryUI (map) {
+window.loadCategoryMap = map => {
   const catSel = document.getElementById('category');
   const subSel = document.getElementById('subcategory');
-
-  // populate main list
-  Object.keys(map).forEach(cat => catSel.add(new Option(cat, cat)));
-
-  // on change, refill sub list
+  Object.keys(map).forEach(c => catSel.add(new Option(c, c)));
   catSel.addEventListener('change', () => {
     subSel.innerHTML = '';
-    (Array.isArray(map[catSel.value]) ? map[catSel.value] : [])
-      .forEach(sub => subSel.add(new Option(sub, sub)));
+    (map[catSel.value] || []).forEach(sc => subSel.add(new Option(sc, sc)));
   });
-}
+};
 
-/* ------------ 3.  Who’s checked? ------------- */
-function getCheckedBeneficiaries () {
-  return Array.from(
-    document.querySelectorAll('#beneficiaries input:checked')
-  ).map(cb => cb.value);           // ["P001", "P003"]
-}
-
-/* ------------ 4.  Submit ------------- */
-document.getElementById('expense-form')
-        .addEventListener('submit', async e => {
+/* 2. submit (no‑CORS) */
+document.getElementById('expense-form').addEventListener('submit', async e => {
   e.preventDefault();
-
-  const payload = {
-    action       : 'addExpense',
-    date         : document.getElementById('date').value,
-    amount       : document.getElementById('amount').value,
-    category     : document.getElementById('category').value,
-    subcategory  : document.getElementById('subcategory').value,
-    description  : document.getElementById('description').value,
-    paymentMethod: document.getElementById('paymentmethod').value,
-    beneficiaries: getCheckedBeneficiaries()
+  const p = {
+    action      : 'addExpense',
+    date        : e.target.date.value,
+    amount      : e.target.amount.value,
+    category    : e.target.category.value,
+    subcategory : e.target.subcategory.value,
+    description : e.target.description.value,
+    payMethod   : e.target.paymethod.value
   };
-
-  try {
-    await fetch(SAVE_URL, {
-      method : 'POST',
-      mode   : 'no-cors',                    // ← 💡 key trick
-      headers: { 'Content-Type': 'text/plain' },
-      body   : JSON.stringify(payload)
-    });
-    alert('Saved 👍');                       // we can’t inspect response
-    e.target.reset();
-  } catch (err) {
-    alert('Save failed – offline?');
-  }
+  await fetch(BASE, {
+    method : 'POST',
+    mode   : 'no-cors',
+    headers: { 'Content-Type':'text/plain' },
+    body   : JSON.stringify(p)
+  });
+  alert('Saved!');
+  e.target.reset();
 });
