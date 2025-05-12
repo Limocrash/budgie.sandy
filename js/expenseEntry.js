@@ -10,6 +10,7 @@
 // --- MINIMAL JSON‑P + NO‑CORS VERSION ---
 
 const BASE = `https://script.google.com/macros/s/${window.BUDGIE_CONFIG.APPS_SCRIPT_ID}/exec`;
+  console.log('BASE:', BASE);
 
 /* 1. load categories via JSON‑P */
 (function () {
